@@ -1,0 +1,23 @@
+#!/bin/sh
+# 在板级默认网络(正确 swconfig:0-3 lan / 4 wan / cpu 6@eth0)基础上,
+# 仅叠加自定义:LAN 静态 IP 与 WAN PPPoE,避免覆盖交换配置导致 LAN 口不通。
+
+# LAN 使用静态地址(不改交换,只改地址)
+uci -q set network.lan.proto='static'
+uci -q set network.lan.ipaddr='192.168.2.1'
+uci -q set network.lan.netmask='255.255.255.0'
+
+# WAN 改为 PPPoE 拨号
+uci -q set network.wan.proto='pppoe'
+uci -q set network.wan.username='tx220323lqc3'
+uci -q set network.wan.password='11111111'
+uci -q set network.wan.ipv6='auto'
+uci -q set network.wan.keepalive='0'
+uci -q del network.wan.ipaddr
+uci -q del network.wan.netmask
+uci -q del network.wan.gateway
+uci -q del network.wan.dns
+
+uci -q commit network
+
+exit 0
