@@ -46,3 +46,19 @@ if [ -f "$CRYPTO_MK" ]; then
     echo "未命中 6.12 gate（上游可能已修复），跳过补丁"
   fi
 fi
+
+# Fix rpcd/iwinfo SIGSEGV on MTK proprietary (mt_dbdc) wifi.
+# lede's 001-ralink.patch (last refreshed 2023-05) leaves six iwinfo_ops members
+# unimplemented: center_chan1, center_chan2, htmode, survey, lookup_phy, phy_path.
+# iwinfo_cli.c:601 and rpcd-mod-iwinfo call ops->htmode() etc. with no NULL check,
+# so PC jumps to 0 (dmesg: "epc = 00000000 in rpcd"), rpcd dies, all in-memory
+# sessions are lost and LuCI reports "Session expired" on the wireless page.
+REPO_DIR=${GITHUB_WORKSPACE:-$(dirname "$0")}
+IWINFO_PATCHES=package/network/utils/iwinfo/patches
+if [ -d "$IWINFO_PATCHES" ] && [ -f "$REPO_DIR/patches/iwinfo/103-ra-missing-ops.patch" ]; then
+  cp "$REPO_DIR/patches/iwinfo/103-ra-missing-ops.patch" "$IWINFO_PATCHES/"
+  echo "已安装 iwinfo ra 后端补丁:"
+  ls -1 "$IWINFO_PATCHES"
+else
+  echo "跳过 iwinfo 补丁（$IWINFO_PATCHES 或补丁文件不存在）"
+fi

@@ -30,7 +30,7 @@ config wifi-iface 'default_rax0'
 	option device 'rax0'
 	option network 'lan'
 	option mode 'ap'
-	option ssid 'ASUS_5G'
+	option ssid 'ASUS_5G1'
 	option encryption 'psk-mixed'
 	option key 'XLGG1987'
 
